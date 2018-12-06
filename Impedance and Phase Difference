@@ -1,0 +1,50 @@
+# Now we are ready to solve for the voltage and phase difference
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Initial Values
+R1 = 3300
+R2 = 4700
+R3 = 22000
+C1 = .015 * 10**-6
+C2 = 330 * 10**-12
+
+# Plotted Frequencies
+f = np.linspace(1, 10**7, num=10**7)
+
+
+# Voltage function runs through the intermediate calculations
+def Voltage(f, R1, R2, R3, C1, C2):
+    Zc1 = -1j/(2*np.pi*f*C1)
+    Zc2 = -1j/(2*np.pi*f*C2)
+    Zr = R1 + R2
+    Zr3 = R3
+
+    Zeq1 = Zr3 + Zc2
+    Zeq2 = (Zr*Zeq1)/(Zr + Zeq1)
+    Ztot = Zc1 + Zeq2
+
+    V_out_in = ((Zc2/Zeq1)*(Zeq2/Ztot))
+    phi = np.angle(V_out_in)*180/np.pi
+    return abs(V_out_in), phi
+
+
+# Creates an array of voltages and phase differences for each frequency value
+voltage_output_input, phase_difference = Voltage(f, R1, R2, R3, C1, C2)
+
+# Plotting the real component of voltage
+plt.plot(np.log10(f), voltage_output_input.real)
+plt.xlim(0, 8)
+plt.xlabel('log10(Frequency) (Hz)')
+plt.ylabel('Vout/Vin')
+plt.title('Plot of Voltage Ratio against Frequency')
+plt.show()
+
+# Plotting the phase difference
+plt.plot(np.log10(f), phase_difference)
+plt.xlim(0, 8)
+plt.xlabel('log10(Frequency) (Hz)')
+plt.ylabel('Phase Difference (Degrees)')
+plt.title('Plot of Phi Against Frequencies')
+plt.show()
